@@ -122,7 +122,7 @@ class AuthorList():
     def available_data(self):
         msno.bar(self.df)
 
-    def birth_map(self):
+    def birth_map(self, marker=False):
         m = Map(
             center=(37, 138),
             zoom=5,
@@ -142,15 +142,15 @@ class AuthorList():
                 wkp = person.place_of_birth["wkp"]
                 coords = get_wiki_coords(wkp)
                 coords_list.append(coords)
-                if coords:
+                if coords and marker:
                     marker = Marker(location=coords, draggable=False, title=title)
-                    #m.add_layer(marker)        
-        heatmap = Heatmap(
-            locations=[[x[0], x[1], 500] for x in coords_list if x],
-            radius=20
-        )
-
-        m.add_layer(heatmap)     
+                    m.add_layer(marker)        
+        if not marker:
+            heatmap = Heatmap(
+                locations=[[x[0], x[1], 500] for x in coords_list if x],
+                radius=20
+            )
+            m.add_layer(heatmap)     
         print(places.most_common(20))
         return m
 
@@ -158,7 +158,8 @@ class AuthorList():
         self.df["gender"].value_counts().plot(kind="pie")
         print(self.df["gender"].value_counts())
 
-    def birth_stats(self):
+    def birth_year_stats(self):
+        print(self.df.groupby("year_of_birth").size())
         self.df.groupby("year_of_birth").size().plot(figsize=(20,12), kind="bar") 
 
     def education_stats(self, topn=20):
