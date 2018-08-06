@@ -37,6 +37,7 @@ def load_persons(id_list):
             place_of_birth = None            
 
         persons.add_person(Person(
+            id_,
             [x for x in data["viaf"]["names"] if x != "ba0yba0b"],
             year_of_birth,
             year_of_death,
@@ -69,6 +70,7 @@ class Person():
     
     def __init__(
         self, 
+        id_,
         names, 
         year_of_birth, 
         year_of_death, 
@@ -78,6 +80,7 @@ class Person():
         wkp,
         article_count
     ):
+        self.id = id_
         self.names = names
         self.year_of_birth = year_of_birth
         self.year_of_death = year_of_death
@@ -162,9 +165,35 @@ class AuthorList():
         print(self.df.groupby("year_of_birth").size())
         self.df.groupby("year_of_birth").size().plot(figsize=(20,12), kind="bar") 
 
+    def death_year_stats(self):
+        print(self.df.groupby("year_of_death").size())
+        self.df.groupby("year_of_death").size().plot(figsize=(20,12), kind="bar") 
+
     def education_stats(self, topn=20):
         education = []
         for person in self.persons:
             education += person.education
         df = pd.DataFrame({"education": education})
         df["education"].value_counts()[:topn].plot(figsize=(20,12), kind="bar")
+
+    def get_gender(self, viaf):
+        for person in self.persons:
+            if person.id == viaf:
+                return person.gender
+    
+    def get_education(self, viaf):
+        for person in self.persons:
+            if person.id == viaf:
+                return person.education
+
+    def get_age(self, viaf, year):
+        for person in self.persons:
+
+            if person.id == viaf: 
+                if not person.year_of_birth:
+                    return None
+                age = year-person.year_of_birth
+                if age < 15:
+                    return None
+                else:
+                    return age
