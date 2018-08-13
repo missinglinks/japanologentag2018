@@ -165,9 +165,12 @@ class AuthorList():
         print(self.df.groupby("year_of_birth").size())
         self.df.groupby("year_of_birth").size().plot(figsize=(20,12), kind="bar") 
 
-    def death_year_stats(self):
+    def death_year_stats(self, cumsum=False):
         print(self.df.groupby("year_of_death").size())
-        self.df.groupby("year_of_death").size().plot(figsize=(20,12), kind="bar") 
+        if cumsum:
+            self.df.groupby("year_of_death").size()[1920:2000].cumsum().plot(figsize=(20,12), kind="line") 
+        else:
+            self.df.groupby("year_of_death").size()[1920:2000].plot(figsize=(20,12), kind="bar") 
 
     def education_stats(self, topn=20):
         education = []
