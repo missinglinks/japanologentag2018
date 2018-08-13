@@ -2,6 +2,7 @@ import json
 import re
 from janome.tokenizer import Tokenizer
 from tqdm import tqdm
+from kyujipy import KyujitaiConverter
 
 
 DATA_FILE = "../data/ck.json"
@@ -23,6 +24,11 @@ def get_titles(filepath):
     for issue in data["issues"]:
         for article in issue["toc"]:
             yield article["title"], issue["year"]
+
+
+converter = KyujitaiConverter()
+def to_shinjitai(s):
+    return converter.kyujitai_to_shinjitai(s)
 
 
 t = Tokenizer()
@@ -61,6 +67,8 @@ def preprocess():
         title = NUMBERING4_RE.sub(" ", title)
         title = PAGING_RE.sub(" ", title)
         title = PAGING2_RE.sub(" ", title)
+
+        title = to_shinjitai(title)
 
         tokens = tokenize(title)
         titles.append(" ".join(tokens))
