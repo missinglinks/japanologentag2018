@@ -71,6 +71,7 @@ def preprocess():
         title = to_shinjitai(title)
 
         tokens = tokenize(title)
+        tokens = [str(year)]+tokens 
         titles.append(" ".join(tokens))
         #print(" ")
 

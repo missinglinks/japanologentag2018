@@ -6,4 +6,18 @@ class Corpus:
     def __iter__(self):
         with open(self.corpus_file, "r") as f:
             for line in f:
-                yield line.strip().split()
+                yield line.strip().split()[1:]
+
+    def count_tokens(self):
+        count = 0
+        with open(self.corpus_file, "r") as f:
+            for line in f:
+                count += len(line.strip().split())
+        return count
+
+    def get_years(self):
+        year_list = []
+        with open(self.corpus_file, "r") as f:
+            for line in f:
+                year_list.append(line.strip().split()[0])
+        return year_list
