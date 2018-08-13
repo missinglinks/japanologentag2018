@@ -26,6 +26,7 @@ def check_phrase_list(phrase_list, tokens):
             if i < len(tokens)-1:
                 if phrase.startswith(tokens[i]) and tokens[i+1] in phrase:
                     tokens[i:i+2] = [ "".join(tokens[i:i+2]) ] 
+                    i = i-1
     return tokens
 
 
@@ -54,7 +55,7 @@ def build_phrase_model():
 
 
 if __name__ == "__main__":
-    build_phrase_model()
-    #phrase_list = load_phrases()
-    #print(check_phrase_list(phrase_list, ["a", "b", "想ひ", "出", "づる", "c"]))
+    #build_phrase_model()
+    phrase_list = load_phrases()
+    print(check_phrase_list(phrase_list, ["a", "b", "想ひ", "出づる", "c"]))
     

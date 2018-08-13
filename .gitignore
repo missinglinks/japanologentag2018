@@ -2,3 +2,5 @@ fuseji.csv
 .ipynb_checkpoints/
 __pycache__/
 config.py
+src/.pytest_cache
+.pytest_cache/
