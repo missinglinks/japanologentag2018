@@ -1,17 +1,12 @@
 from gensim.models.phrases import Phraser, Phrases
 from tqdm import tqdm
+from utils import Corpus
 
 CORPUS_FILE = "../corpus/corpus_preproc.txt"
 PHRASES_FILE = "../data/phrases.txt"
 
 MODEL_FILE = "../models/bigram.model"
 OUT_FILE = "../corpus/corpus_phrases.txt"
-
-class Corpus:
-    def __iter__(self):
-        with open(CORPUS_FILE, "r") as f:
-            for line in f:
-                yield line.strip().split()
 
 
 def load_phrases():
@@ -39,13 +34,13 @@ def build_phrase_model():
 
     phrase_list = load_phrases()
 
-    phrases = Phrases(Corpus())
+    phrases = Phrases(Corpus(CORPUS_FILE))
     bigrams = Phraser(phrases)
 
     bigrams.save(MODEL_FILE)
 
     with open(OUT_FILE, "w") as f:
-        for line in tqdm(bigrams[Corpus()]):
+        for line in tqdm(bigrams[Corpus(CORPUS_FILE)]):
 
             line = remove_under(line)
             line = check_phrase_list(phrase_list, line)
