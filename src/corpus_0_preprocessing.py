@@ -23,7 +23,8 @@ def get_titles(filepath):
     data = json.load(open(filepath))
     for issue in data["issues"]:
         for article in issue["toc"]:
-            yield article["title"], issue["year"]
+            viaf_ids =  [ x["viaf"]["viaf_id"] for x in article["authors_viaf"] if x["viaf"] ]
+            yield article["title"], issue["year"], viaf_ids
 
 
 converter = KyujitaiConverter()
@@ -41,8 +42,10 @@ def preprocess():
 
     titles = []
 
-    for title, year in tqdm(get_titles(DATA_FILE)):
+    for title, year, viaf_ids in tqdm(get_titles(DATA_FILE)):
         #print(title)
+        if viaf_ids == []:
+            viaf_ids = [";"]
 
         title = title.replace("ーー", " ")
         title = title.replace("ー上ー"," ")
@@ -71,7 +74,9 @@ def preprocess():
         title = to_shinjitai(title)
 
         tokens = tokenize(title)
-        tokens = [str(year)]+tokens 
+        tokens = [ ";".join(viaf_ids) ] + tokens
+        tokens = [ str(year) ] + tokens 
+
         titles.append(" ".join(tokens))
         #print(" ")
 

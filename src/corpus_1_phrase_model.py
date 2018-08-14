@@ -40,6 +40,7 @@ def build_phrase_model():
     bigrams.save(MODEL_FILE)
 
     years = Corpus(CORPUS_FILE).get_years()
+    authors = Corpus(CORPUS_FILE).get_authors()
 
     with open(OUT_FILE, "w") as f:
         for i, line in tqdm(enumerate(bigrams[Corpus(CORPUS_FILE)])):
@@ -47,6 +48,7 @@ def build_phrase_model():
             line = remove_under(line)
             line = check_phrase_list(phrase_list, line)
 
+            line = [ authors[i] ] + line
             line = [ years[i] ] + line
 
             f.write("{}\n".format(" ".join(remove_under(line))))
