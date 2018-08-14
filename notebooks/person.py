@@ -7,12 +7,14 @@ from collections import Counter
 from ipyleaflet import *
 from ipywidgets import Button, Layout
 from SPARQLWrapper import SPARQLWrapper, JSON
+from corpus import Corpus
 
 PERSONS = "../data/person_dict.json"
 
 
-def load_persons(id_list):
-    persons = AuthorList()
+
+def load_persons(id_list, label):
+    persons = AuthorList(label)
 
     person_dict = json.load(open(PERSONS))
 
@@ -107,9 +109,14 @@ class Person():
 
 class AuthorList():
 
-    def __init__(self):
+    def __init__(self, label=""):
         self.persons = []
         self.df = None
+        self.label = label
+
+    def __iter__(self):
+        for person in self.persons:
+            yield person
 
     def setup_df(self):
         self.df = self.get_dataframe()
@@ -125,6 +132,34 @@ class AuthorList():
     def available_data(self):
         msno.bar(self.df)
 
+
+    def intersection(self, *others):
+        this_list = set([ x.id for x in self ])
+        for other in others:
+            other_list = set([ x.id for x in other ])
+            this_list = this_list.intersection(other_list)
+
+        return load_persons([ (x, None) for x in this_list], self.label+"_intersection")
+    
+    def exclude(self, other):
+        this_list = set([ x.id for x in self ])
+        other_list = set([ x.id for x in other ])
+        this_list = this_list - other_list
+        return load_persons([ (x, None) for x in this_list], self.label+"_exclude_"+other.label)
+
+    #### corpus
+    def get_corpus(self):
+        viaf_ids = [ x.id for x in self ]
+        return Corpus(viaf_ids)
+
+
+    #### publication map
+
+
+
+
+    #### MAP
+    
     def birth_map(self, marker=False):
         m = Map(
             center=(37, 138),
@@ -156,6 +191,9 @@ class AuthorList():
             m.add_layer(heatmap)     
         print(places.most_common(20))
         return m
+
+
+    #### STATISTICS
 
     def gender_stats(self):
         self.df["gender"].value_counts().plot(kind="pie")

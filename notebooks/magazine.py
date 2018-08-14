@@ -27,7 +27,8 @@ class Magazine():
                     authors += [ x["viaf"]["viaf_id"] for x in article["authors_viaf"] if x["viaf"] ]
         authors = list(set(authors))
         authors = [ x for x in a.items() if x[1] >= threshold ]
-        return load_persons(list(set(authors)))
+        label = "{}-{}".format(year_from, year_to)
+        return load_persons(list(set(authors)), label)
 
 
     def gender_overview(self):

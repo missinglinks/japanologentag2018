@@ -4,3 +4,4 @@ __pycache__/
 config.py
 src/.pytest_cache
 .pytest_cache/
+.vscode/
