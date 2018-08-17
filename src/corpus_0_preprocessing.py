@@ -34,7 +34,7 @@ def to_shinjitai(s):
 
 t = Tokenizer()
 def tokenize(s):
-    tokens = [ token.base_form for token in t.tokenize(s) if  "記号" not in token.part_of_speech]
+    tokens = [ token.base_form for token in t.tokenize(s) if  "記号" not in token.part_of_speech and "助動詞" not in token.part_of_speech and "助詞" not in token.part_of_speech]
     return tokens
 
 
