@@ -17,18 +17,25 @@ class Magazine():
 
 
 
-    def get_authors(self, year_from=1919, year_to=2001, threshold=1):
+    def get_authors(self, year_from=1919, year_to=2001, threshold=1, gender="all"):
         authors = []
         a = Counter()
+        author_years = defaultdict(list)
+        author_names = defaultdict(list)
         for issue in self.data["issues"]:
             if issue["year"] >= year_from and issue["year"] <= year_to:
                 for article in issue["toc"]:
-                    a.update([ x["viaf"]["viaf_id"] for x in article["authors_viaf"] if x["viaf"] ])
-                    authors += [ x["viaf"]["viaf_id"] for x in article["authors_viaf"] if x["viaf"] ]
-        authors = list(set(authors))
+                    #a.update([ x["viaf"]["viaf_id"] for x in article["authors_viaf"] if x["viaf"] ])
+                    for author in article["authors_viaf"]:
+                        if author["viaf"]:
+                            a.update([author["viaf"]["viaf_id"]])
+                            author_years[author["viaf"]["viaf_id"]].append(issue["year"])
+                            author_names[author["viaf"]["viaf_id"]].append(author["name"])
+                    #authors += [ x["viaf"]["viaf_id"]) for x in article["authors_viaf"] if x["viaf"] ]
+        #authors = list(set(authors)) 
         authors = [ x for x in a.items() if x[1] >= threshold ]
         label = "{}-{}".format(year_from, year_to)
-        return load_persons(list(set(authors)), label)
+        return load_persons(list(set(authors)), author_names, author_years, label, gender)
 
 
     def gender_overview(self):

@@ -13,8 +13,8 @@ PERSONS = "../data/person_dict.json"
 
 
 
-def load_persons(id_list, label):
-    persons = AuthorList(label)
+def load_persons(id_list, author_names, author_years, label, gender="all"):
+    persons = AuthorList(label, author_names, author_years)
 
     person_dict = json.load(open(PERSONS))
 
@@ -38,9 +38,13 @@ def load_persons(id_list, label):
         except:
             place_of_birth = None            
 
+        if gender != "all":
+            if gender != data["wiki"]["gender"]:
+                continue
+
         persons.add_person(Person(
             id_,
-            [x for x in data["viaf"]["names"] if x != "ba0yba0b"],
+            list(set(author_names[id_]))[0],
             year_of_birth,
             year_of_death,
             data["wiki"]["gender"],
@@ -73,7 +77,7 @@ class Person():
     def __init__(
         self, 
         id_,
-        names, 
+        name, 
         year_of_birth, 
         year_of_death, 
         gender, 
@@ -83,7 +87,7 @@ class Person():
         article_count
     ):
         self.id = id_
-        self.names = names
+        self.name = name
         self.year_of_birth = year_of_birth
         self.year_of_death = year_of_death
         self.gender = gender
@@ -94,22 +98,25 @@ class Person():
 
     def to_json(self):
         data = {
-            "name": self.names[0],
+            "name": self.name,
             "year_of_birth": self.year_of_birth if self.year_of_birth != 0 else None,
             "year_of_death": self.year_of_death if self.year_of_death != 0 else None,
             "gender": self.gender,
             "place_of_birth": self.place_of_birth,
             "education": "; ".join(self.education) if len(self.education) > 0 else None,
-            "wikidata": self.wkp
+            "wikidata": self.wkp,
+            "article_count": self.article_count
         }
         return data
     
     def get_en_name(self):
-        return sample(self.names,1)[0]
+        return self.name
 
 class AuthorList():
 
-    def __init__(self, label=""):
+    def __init__(self, author_names, author_years, label=""):
+        self.author_names = author_names
+        self.author_years = author_years
         self.persons = []
         self.df = None
         self.label = label
@@ -139,13 +146,13 @@ class AuthorList():
             other_list = set([ x.id for x in other ])
             this_list = this_list.intersection(other_list)
 
-        return load_persons([ (x, None) for x in this_list], self.label+"_intersection")
+        return load_persons([ (x, None) for x in this_list], self.author_names, self.author_years, self.label+"_intersection")
     
     def exclude(self, other):
         this_list = set([ x.id for x in self ])
         other_list = set([ x.id for x in other ])
         this_list = this_list - other_list
-        return load_persons([ (x, None) for x in this_list], self.label+"_exclude_"+other.label)
+        return load_persons([ (x, None) for x in this_list], self.author_names, self.author_years, self.label+"_exclude_"+other.label)
 
     #### corpus
     def get_corpus(self):
